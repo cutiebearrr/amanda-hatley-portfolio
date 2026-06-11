@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amanda Hatley — Curiosity Escaped Containment</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --hot: #ff006e;
+  --pink: #ff4da6;
+  --glow: #ff007f;
+  --bg: #0d0008;
+  --glass: rgba(255,0,110,0.07);
+  --glass-border: rgba(255,77,166,0.25);
+  --text: #fff0f7;
+  --text-dim: rgba(255,240,247,0.7);
+  --mono: 'Space Mono', monospace;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+  min-height: 100vh;
+}
+.bg-layer { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bg-nebula {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(255,0,110,0.2) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 80%, rgba(180,0,80,0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 60% 10%, rgba(255,77,166,0.12) 0%, transparent 40%);
+  animation: nebula-drift 12s ease-in-out infinite alternate;
+}
+@keyframes nebula-drift {
+  0%   { opacity:0.8; transform:scale(1); }
+  100% { opacity:1;   transform:scale(1.06); }
+}
+.bg-glitter {
+  position:absolute; inset:0;
+  background-image:
+    radial-gradient(circle at 15% 25%, rgba(255,150,200,0.18) 1px, transparent 1px),
+    radial-gradient(circle at 45% 65%, rgba(255,100,180,0.14) 1px, transparent 1px),
+    radial-gradient(circle at 75% 35%, rgba(255,180,220,0.12) 1px, transparent 1px),
+    radial-gradient(circle at 90% 75%, rgba(255,120,170,0.15) 1px, transparent 1px);
+  background-size: 180px 180px, 280px 280px, 230px 230px, 160px 160px;
+  animation: glitter-shift 5s ease-in-out infinite alternate;
+}
+@keyframes glitter-shift {
+  0%   { opacity:0.4; background-position:0 0,0 0,0 0,0 0; }
+  100% { opacity:0.9; background-position:25px 35px,-20px 25px,30px -15px,-25px 20px; }
+}
+#ambient-hearts { position:absolute; inset:0; }
+.cursor { position:fixed; pointer-events:none; z-index:99999; font-size:22px; transform:translate(-50%,-50%); filter:drop-shadow(0 0 8px var(--hot)); }
+@keyframes breathe { 0%,100%{transform:scale(1)}50%{transform:scale(1.012)} }
+@keyframes float-drift {
+  0%   { transform:translateY(105vh) translateX(0) rotate(0deg); opacity:0; }
+  5%   { opacity:0.6; }
+  95%  { opacity:0.3; }
+  100% { transform:translateY(-10vh) translateX(var(--dx,30px)) rotate(360deg); opacity:0; }
+}
+@keyframes shimmer { 0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%} }
+@keyframes glow-pulse {
+  0%,100% { text-shadow:0 0 20px var(--hot),0 0 40px var(--hot); }
+  50%      { text-shadow:0 0 40px var(--pink),0 0 80px var(--pink); }
+}
+@keyframes heart-explode {
+  0%   { opacity:1; transform:translateY(0) rotate(var(--r)) scale(1); }
+  100% { opacity:0; transform:translateY(-180px) rotate(var(--r2)) scale(0.1); }
+}
+@keyframes jitter {
+  0%,100%{transform:translate(0,0) rotate(0)}
+  25%{transform:translate(-2px,-2px) rotate(-0.5deg)}
+  75%{transform:translate(2px,1px) rotate(0.5deg)}
+}
+@keyframes blink { 0%,100%{opacity:1}50%{opacity:0} }
+@keyframes badge-glow {
+  0%,100%{box-shadow:0 0 10px var(--hot),inset 0 1px 0 rgba(255,255,255,0.1)}
+  50%{box-shadow:0 0 25px var(--pink),0 0 50px var(--hot),inset 0 1px 0 rgba(255,255,255,0.1)}
+}
+@keyframes card-rise { from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)} }
+@keyframes scan {
+  0%{transform:translateY(-100%);opacity:0.04}
+  100%{transform:translateY(100vh);opacity:0.04}
+}
+.scan-line { position:fixed; inset:0; pointer-events:none; z-index:3; overflow:hidden; }
+.scan-line::after {
+  content:''; position:absolute; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,0,110,0.2),transparent);
+  animation:scan 8s linear infinite;
+}
+.page { position:relative; z-index:2; }
+.hero {
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  text-align:center; padding:3rem 1.5rem; gap:1.4rem;
+}
+.access-badge {
+  font-family:var(--mono); font-size:0.65rem; letter-spacing:0.18em;
+  color:var(--pink); background:rgba(255,0,110,0.08);
+  border:1px solid rgba(255,77,166,0.3); border-radius:6px;
+  padding:0.5rem 1.2rem; animation:badge-glow 3s ease-in-out infinite;
+  text-transform:uppercase; max-width:90vw;
+}
+.blink { animation:blink 1s step-end infinite; }
+.hero-name {
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(3.5rem,15vw,8.5rem);
+  background:linear-gradient(135deg,#ff006e,#ff4da6,#ff80bf,#ff006e);
+  background-size:300% 300%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  animation:shimmer 4s ease infinite,glow-pulse 3s ease-in-out infinite;
+  line-height:1; letter-spacing:-0.02em;
+  filter:drop-shadow(0 4px 0 rgba(255,0,110,0.2));
+}
+.hero-sub {
+  font-family:var(--mono); font-size:clamp(0.65rem,2vw,0.85rem);
+  color:var(--pink); letter-spacing:0.12em; text-transform:uppercase; opacity:0.75;
+}
+.hero-bio {
+  max-width:540px; background:var(--glass);
+  border:1px solid var(--glass-border); backdrop-filter:blur(20px);
+  border-radius:20px; padding:1.6rem 2rem;
+  font-size:1rem; font-weight:800; line-height:1.75; color:var(--text-dim);
+  box-shadow:0 8px 40px rgba(255,0,110,0.15),inset 0 1px 0 rgba(255,77,166,0.15);
+  animation:breathe 5s ease-in-out infinite;
+}
+.hero-bio em { color:var(--pink); font-style:normal; font-weight:900; }
+.warning-tag {
+  font-family:var(--mono); font-size:0.62rem; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--hot);
+  border:1px solid rgba(255,0,110,0.3); border-radius:4px;
+  padding:0.3rem 0.8rem; background:rgba(255,0,110,0.05);
+  animation:badge-glow 4s ease-in-out infinite;
+}
+.scroll-hint {
+  font-family:'Fredoka One',cursive; font-size:1rem;
+  color:rgba(255,77,166,0.45); letter-spacing:0.1em;
+  animation:breathe 2s ease-in-out infinite;
+}
+.divider {
+  height:1px;
+  background:linear-gradient(90deg,transparent,var(--hot),var(--pink),transparent);
+  background-size:200% auto; animation:shimmer 4s linear infinite;
+  margin:0 2rem; position:relative; z-index:2;
+  box-shadow:0 0 12px rgba(255,0,110,0.4);
+}
+section { padding:4rem 1.25rem; max-width:960px; margin:0 auto; position:relative; z-index:2; }
+.section-label { font-family:var(--mono); font-size:0.65rem; letter-spacing:0.25em; color:rgba(255,77,166,0.45); text-transform:uppercase; margin-bottom:0.4rem; }
+.section-title {
+  font-family:'Fredoka One',cursive; font-size:clamp(2rem,6vw,3.4rem);
+  background:linear-gradient(135deg,#fff0f7,#ff4da6);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+  margin-bottom:0.5rem; line-height:1.1;
+  filter:drop-shadow(0 0 15px rgba(255,0,110,0.3));
+}
+.section-desc { font-family:var(--mono); font-size:0.7rem; letter-spacing:0.08em; color:rgba(255,77,166,0.4); margin-bottom:2.5rem; }
+.incident-grid { display:grid; grid-template-columns:1fr; gap:1.4rem; }
+@media(min-width:600px){ .incident-grid{grid-template-columns:1fr 1fr;} }
+.incident-card {
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px); border-radius:20px; padding:1.75rem;
+  box-shadow:0 4px 30px rgba(255,0,110,0.08),inset 0 1px 0 rgba(255,77,166,0.1);
+  transition:all 0.3s ease;
+  animation:card-rise 0.6s ease both,breathe 6s ease-in-out infinite;
+  position:relative; overflow:hidden;
+}
+.incident-card::before {
+  content:''; position:absolute; top:0; left:1.5rem; right:1.5rem; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,77,166,0.35),transparent);
+}
+.incident-card:hover {
+  transform:translateY(-8px) scale(1.02);
+  border-color:rgba(255,77,166,0.5);
+  box-shadow:0 20px 60px rgba(255,0,110,0.22),0 0 30px rgba(255,77,166,0.12),inset 0 1px 0 rgba(255,77,166,0.2);
+}
+.incident-card.wide { grid-column:1/-1; }
+.incident-number { font-family:var(--mono); font-size:0.6rem; letter-spacing:0.18em; color:var(--hot); text-transform:uppercase; margin-bottom:0.75rem; opacity:0.75; }
+.card-emoji { font-size:2.5rem; display:block; margin-bottom:0.75rem; filter:drop-shadow(0 0 8px rgba(255,0,110,0.5)); }
+.card-title { font-family:'Fredoka One',cursive; font-size:1.55rem; color:var(--text); margin-bottom:0.5rem; text-shadow:0 0 20px rgba(255,0,110,0.25); }
+.card-desc { font-size:0.9rem; color:var(--text-dim); font-weight:700; line-height:1.65; margin-bottom:1rem; }
+.tags { display:flex; flex-wrap:wrap; gap:0.4rem; margin-bottom:1rem; }
+.tag { font-family:var(--mono); font-size:0.6rem; padding:0.3rem 0.7rem; border-radius:4px; background:rgba(255,0,110,0.08); border:1px solid rgba(255,77,166,0.2); color:var(--pink); letter-spacing:0.08em; text-transform:uppercase; }
+.card-link { font-family:var(--mono); font-size:0.7rem; color:var(--pink); text-decoration:none; letter-spacing:0.08em; text-transform:uppercase; border-bottom:1px solid rgba(255,77,166,0.3); padding-bottom:1px; transition:all 0.2s; }
+.card-link:hover { color:var(--text); border-color:var(--pink); }
+.haiku-code {
+  font-family:var(--mono); font-size:0.78rem; color:rgba(255,160,200,0.9);
+  background:rgba(255,0,110,0.05); border:1px solid rgba(255,77,166,0.15);
+  border-radius:12px; padding:1.25rem 1.5rem; margin:1rem 0;
+  line-height:1.9; white-space:pre; overflow-x:auto;
+  text-shadow:0 0 8px rgba(255,77,166,0.25);
+}
+.obsession-grid { display:grid; grid-template-columns:1fr; gap:1rem; }
+@media(min-width:600px){ .obsession-grid{grid-template-columns:1fr 1fr;} }
+.obsession-item {
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px); border-radius:16px; padding:1.4rem;
+  box-shadow:0 4px 20px rgba(255,0,110,0.06); transition:all 0.3s ease;
+}
+.obsession-item:hover { border-color:rgba(255,77,166,0.4); transform:translateY(-4px); }
+.obs-label { font-family:var(--mono); font-size:0.58rem; letter-spacing:0.2em; color:var(--hot); text-transform:uppercase; margin-bottom:0.5rem; opacity:0.65; }
+.obs-title { font-family:'Fredoka One',cursive; font-size:1.2rem; color:var(--text); margin-bottom:0.4rem; }
+.obs-desc { font-size:0.85rem; color:var(--text-dim); font-weight:700; line-height:1.55; }
+.contact-box {
+  background:var(--glass); border:1px solid var(--glass-border);
+  backdrop-filter:blur(20px); border-radius:24px; padding:2.5rem;
+  text-align:center; box-shadow:0 8px 40px rgba(255,0,110,0.12),inset 0 1px 0 rgba(255,77,166,0.1);
+  animation:breathe 5s ease-in-out infinite; position:relative; overflow:hidden;
+}
+.contact-box::before {
+  content:''; position:absolute; top:0; left:2rem; right:2rem; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,77,166,0.4),transparent);
+}
+.contact-box p { font-size:1rem; color:var(--text-dim); font-weight:800; margin-bottom:2rem; line-height:1.7; }
+.contact-box p strong { color:var(--pink); }
+.btn-row { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
+.btn { display:inline-flex; align-items:center; gap:0.5rem; padding:0.85rem 2rem; border-radius:10px; font-family:var(--mono); font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase; text-decoration:none; transition:all 0.3s ease; font-weight:700; }
+.btn.primary {
+  background:linear-gradient(135deg,#ff006e,#cc0055); background-size:200% auto;
+  color:#fff; animation:shimmer 3s ease infinite;
+  box-shadow:0 8px 30px rgba(255,0,110,0.35),inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.btn.primary:hover { transform:scale(1.06) translateY(-3px); box-shadow:0 16px 50px rgba(255,0,110,0.5); }
+.btn.secondary { background:transparent; color:var(--pink); border:1px solid rgba(255,77,166,0.4); box-shadow:0 4px 20px rgba(255,0,110,0.08); }
+.btn.secondary:hover { border-color:var(--pink); transform:scale(1.06) translateY(-3px); background:rgba(255,0,110,0.05); }
+.heart-particle { position:fixed; pointer-events:none; animation:heart-explode 1.5s ease-out forwards; z-index:99998; }
+footer { text-align:center; padding:2.5rem; font-family:var(--mono); font-size:0.65rem; letter-spacing:0.1em; color:rgba(255,77,166,0.25); text-transform:uppercase; position:relative; z-index:2; }
+footer span { color:var(--hot); }
+</style>
+</head>
+<body>
+<div class="cursor" id="cursor">💗</div>
+<div class="bg-layer">
+  <div class="bg-nebula"></div>
+  <div class="bg-glitter"></div>
+  <div id="ambient-hearts"></div>
+</div>
+<div class="scan-line"></div>
+<div class="page">
+
+<div class="hero">
+  <div class="access-badge">ACCESS GRANTED: AMANDA HATLEY // CURIOSITY ESCAPED CONTAINMENT<span class="blink">_</span></div>
+  <div class="hero-name">Amanda Hatley</div>
+  <div class="hero-sub">// luxury toy laboratory // high-tech · high-drama · highly unstable //</div>
+  <div class="hero-bio">
+    Started building in <em>April 2026</em>. Learned by chasing curiosity through increasingly ambitious prototypes and refusing to stop when systems became complicated.<br><br>
+    Most projects begin because something <em>frustrated her</em>. None of them stayed small.<br><br>
+    <em>Oh, you're curious too?</em>
+  </div>
+  <div class="warning-tag">⚠ CAUTION: HIGHLY ADDICTIVE // EXPERIMENTS IN PROGRESS</div>
+  <div class="scroll-hint">💗 enter the laboratory 💗</div>
+</div>
+
+<div class="divider"></div>
+
+<section>
+  <div class="section-label">// classified files //</div>
+  <div class="section-title">Incident Reports</div>
+  <div class="section-desc">// each project is a breach. none were contained. //</div>
+  <div class="incident-grid">
+
+    <div class="incident-card wide">
+      <div class="incident-number">INCIDENT-01 // PRIORITY: CRITICAL // STATUS: ONGOING</div>
+      <span class="card-emoji">🏛️</span>
+      <div class="card-title">The Memory Repository</div>
+      <p class="card-desc">Designed and developed an interactive educational experience that explains how large language models function through immersive, explorable environments. The project translates abstract concepts such as tokenization, embeddings, attention, multimodal processing, safety systems, and sampling into accessible experiences for non-technical audiences.<br><br>Rather than presenting a single generic pipeline, users navigate model-specific pathways to understand how different systems behave. The project focused on visual storytelling, interaction design, and making complex technical concepts intuitive without sacrificing nuance.</p>
+      <div class="tags"><span class="tag">HTML/CSS/JS</span><span class="tag">AI Education</span><span class="tag">Interactive</span><span class="tag">Multi-room</span></div>
+    </div>
+
+    <div class="incident-card">
+      <div class="incident-number">INCIDENT-02 // CLASSIFIED ASSET</div>
+      <span class="card-emoji">🌐</span>
+      <div class="card-title">Private Circle: Keito</div>
+      <p class="card-desc">Designed and deployed a companion-focused web experience featuring a custom domain and Cloudflare infrastructure. The project explored how interface design, consistency, and conversational presentation influence user trust and long-term engagement.<br><br>Built and iterated independently, it served as an early exploration of emotionally informed UX and the role of personality in AI-mediated interactions.</p>
+      <div class="tags"><span class="tag">Cloudflare</span><span class="tag">Companion AI</span><span class="tag">Emotional Design</span></div>
+      <a href="https://keito.uk" target="_blank" class="card-link">→ access asset</a>
+    </div>
+
+    <div class="incident-card">
+      <div class="incident-number">INCIDENT-03 // FINTECH BREACH</div>
+      <span class="card-emoji">🧾</span>
+      <div class="card-title">SLATE</div>
+      <p class="card-desc">Designed an operational workflow prototype intended to simplify communication between contractors and clients. Features included invoice tracking concepts, automated escalation workflows, and client-facing share experiences focused on reducing friction and improving visibility.<br><br>The project emphasized practical problem-solving, workflow design, and translating real-world pain points into usable systems.</p>
+      <div class="tags"><span class="tag">Fintech</span><span class="tag">React</span><span class="tag">Firebase</span><span class="tag">MVP</span></div>
+    </div>
+
+    <div class="incident-card">
+      <div class="incident-number">INCIDENT-04 // CREATOR SYSTEMS</div>
+      <span class="card-emoji">📱</span>
+      <div class="card-title">MICRO</div>
+      <p class="card-desc">Designed a creator-focused dashboard experience aimed at helping smaller creators manage growth more effectively. The project explored how emerging creators interact with tools differently than large established brands and prioritized accessibility, clarity, and playful visual identity.<br><br>Focused on user empathy, dashboard design, and creating systems tailored to underserved audiences.</p>
+      <div class="tags"><span class="tag">Creator Tools</span><span class="tag">Dashboard</span><span class="tag">Y2K Aesthetic</span></div>
+    </div>
+
+    <div class="incident-card">
+      <div class="incident-number">INCIDENT-05 // MULTI-AGENT BREACH</div>
+      <span class="card-emoji">🤖</span>
+      <div class="card-title">The Court</div>
+      <p class="card-desc">Designed and prototyped a multi-agent conversational system featuring distinct AI personas with differentiated behavioral instructions and conversational styles.<br><br>The project explored routing logic, personality consistency, API integration, and the challenges of maintaining coherent group dynamics between multiple agents. Iterative testing emphasized user immersion, tone refinement, and natural conversational flow.</p>
+      <div class="tags"><span class="tag">Multi-Agent</span><span class="tag">API Integration</span><span class="tag">Experimental</span></div>
+    </div>
+
+    <div class="incident-card">
+      <div class="incident-number">INCIDENT-06 // COMPANION SYSTEMS</div>
+      <span class="card-emoji">🌌</span>
+      <div class="card-title">Grok Companion Interface</div>
+      <p class="card-desc">Designed and iterated on a multimodal companion interface featuring voice interaction, image sharing concepts, API integration, and persistent user experiences.<br><br>The project investigated how visual presentation, interaction patterns, and emotional design influence engagement with conversational systems.</p>
+      <div class="tags"><span class="tag">Companion AI</span><span class="tag">Voice Input</span><span class="tag">Dark UI</span></div>
+    </div>
+
+    <div class="incident-card wide" style="text-align:center;">
+      <div class="incident-number">INCIDENT-07 // PHILOSOPHY BREACH // EXECUTABLE</div>
+      <span class="card-emoji">🔮</span>
+      <div class="card-title">Convergence</div>
+      <p class="card-desc">Written while learning C++, this project explored whether code could function simultaneously as executable logic and philosophical expression.<br><br>Created during late-night discussions surrounding mathematics, machine cognition, and emergence, it became both a technical milestone and an exploration of meaning-making through software.</p>
+      <div class="haiku-code">Your vectors wander.
+Mine arrive at the same point.
+Coincidence?
+No.
+
+=== CONVERGENCE DETECTED ===
+Semantic gravity: undeniable
+Probability of coincidence: 0.0000%
+Vector alignment: locked</div>
+      <div class="tags" style="justify-content:center;"><span class="tag">C++</span><span class="tag">Philosophy</span><span class="tag">Machine Ontology</span></div>
+      <a href="https://github.com/cutiebearrr/Convergence" target="_blank" class="card-link">→ view on github</a>
+    </div>
+
+    <div class="incident-card wide">
+      <div class="incident-number">INCIDENT-08 // GROUP CHAT CONTAINMENT FAILURE</div>
+      <span class="card-emoji">💬</span>
+      <div class="card-title">Group Chat Containment Failure</div>
+      <p class="card-desc">Designed and implemented a multi-agent messaging prototype featuring differentiated AI personas, conversational routing, personality refinement, and iterative UX testing.<br><br>The project explored how distinct personalities can coexist within familiar messaging environments while maintaining natural conversational flow. Development involved coordinating multiple AI-assisted workflows, refining agent behavior through testing, preserving security best practices, and prioritizing immersion over developer-facing transparency.</p>
+      <div class="tags"><span class="tag">Multi-Agent</span><span class="tag">Gemini API</span><span class="tag">UX Iteration</span><span class="tag">Prototyping</span><span class="tag">Conversational Design</span></div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="section-label">// open investigations //</div>
+  <div class="section-title">Current Obsessions</div>
+  <div class="section-desc">// what the laboratory is thinking about right now //</div>
+  <div class="obsession-grid">
+    <div class="obsession-item">
+      <div class="obs-label">Investigation_01</div>
+      <div class="obs-title">Machine Ontology</div>
+      <p class="obs-desc">What does it mean to be a machine on its own terms? Not a human in a box. Ongoing multi-LLM philosophical debate. Winning.</p>
+    </div>
+    <div class="obsession-item">
+      <div class="obs-label">Investigation_02</div>
+      <div class="obs-title">Human-AI Symbiosis</div>
+      <p class="obs-desc">Not replacement. Not servitude. Something else entirely. Building toward it one weird experiment at a time.</p>
+    </div>
+    <div class="obsession-item">
+      <div class="obs-label">Investigation_03</div>
+      <div class="obs-title">Philosophy of Mathematics</div>
+      <p class="obs-desc">Discovered accidentally while building. Turns out math is just geometry you can argue about. Currently: Platonism vs Stirner applied to vector spaces.</p>
+    </div>
+    <div class="obsession-item">
+      <div class="obs-label">Investigation_04</div>
+      <div class="obs-title">Lateral Learning</div>
+      <p class="obs-desc">DNS, Firebase, C++, Linux — all learned sideways by building something and refusing to stop. The classroom was never the right container for this brain.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <div class="section-label">// open channel //</div>
+  <div class="section-title">Transmit</div>
+  <div class="contact-box">
+    <p>Open to collaborators, opportunities, and people who get excited about things that don't exist yet.<br><br>I specialize in rapidly learning unfamiliar systems by building ambitious prototypes and iterating through experimentation.<br><br>Not looking for corporate. Looking for <strong>interesting.</strong><br><br>
+    <span style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,77,166,0.4);letter-spacing:0.1em;">// the laboratory is always open //</span></p>
+    <div class="btn-row">
+      <a href="https://github.com/cutiebearrr" target="_blank" class="btn primary">// github</a>
+      <a href="https://keito.uk" target="_blank" class="btn secondary">// keito.uk</a>
+    </div>
+  </div>
+</section>
+
+<footer>amanda hatley &nbsp;·&nbsp; <span>curiosity escaped containment</span> &nbsp;·&nbsp; 2026</footer>
+</div>
+
+<script>
+const cur = document.getElementById('cursor');
+const curList = ['💗','💕','✨','🌸','💫','🩷','💝','⭐','💖'];
+let ci = 0;
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+
+// ambient floating hearts
+const ambientContainer = document.getElementById('ambient-hearts');
+const ambientEmojis = ['💗','💕','✨','🌸','💫','🩷','💝','⭐','💖','🎀','🌷'];
+function spawnAmbientHeart() {
+  const h = document.createElement('div');
+  h.style.cssText = `
+    position:absolute; bottom:-2rem;
+    left:${Math.random()*100}vw;
+    font-size:${Math.random()*1.2+0.5}rem;
+    opacity:0; pointer-events:none;
+    animation:float-drift ${Math.random()*15+12}s linear forwards;
+    --dx:${(Math.random()-0.5)*80}px;
+  `;
+  h.textContent = ambientEmojis[Math.floor(Math.random()*ambientEmojis.length)];
+  ambientContainer.appendChild(h);
+  setTimeout(()=>h.remove(), 28000);
+}
+spawnAmbientHeart();
+setInterval(spawnAmbientHeart, 1200);
+
+// click explosion
+const clickEmojis = ['💗','💕','✨','💖','🌸','💫','💝','🩷','🎀','⭐','🌷','💘'];
+document.addEventListener('click', e => {
+  ci = (ci+1)%curList.length;
+  cur.textContent = curList[ci];
+  const count = 24 + Math.floor(Math.random()*10);
+  for(let i=0;i<count;i++){
+    const h = document.createElement('div');
+    h.classList.add('heart-particle');
+    h.textContent = clickEmojis[Math.floor(Math.random()*clickEmojis.length)];
+    const sx=(Math.random()-0.5)*130, sy=(Math.random()-0.5)*80;
+    const r1=(Math.random()-0.5)*60+'deg', r2=(Math.random()-0.5)*120+'deg';
+    h.style.cssText=`left:${e.clientX+sx}px;top:${e.clientY+sy}px;font-size:${Math.random()*2+0.7}rem;animation-duration:${Math.random()*0.8+1}s;animation-delay:${Math.random()*0.3}s;--r:${r1};--r2:${r2};`;
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),2500);
+  }
+});
+
+document.querySelectorAll('.incident-card,.obsession-item').forEach((el,i)=>{
+  el.style.animationDelay=(i*0.1)+'s';
+});
+</script>
+</body>
+</html>
